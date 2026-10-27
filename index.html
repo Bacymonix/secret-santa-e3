@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#004899">
+  <title>Secret Santa — Ense³</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .hidden { display: none !important; }
+    .field-photo { cursor: pointer; }
+    .photo-placeholder {
+      display: inline-block;
+      margin-top: 0.25rem;
+      opacity: 0.85;
+      font-size: 0.95rem;
+    }
+    .photo-preview,
+    .recipient-photo {
+      display: block;
+      max-width: 140px;
+      max-height: 140px;
+      width: auto;
+      height: auto;
+      border-radius: 12px;
+      margin-top: 0.5rem;
+      object-fit: cover;
+    }
+    .recipient-photo {
+      margin: 0.75rem auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Paysage alpin -->
+  <div class="winter-scene" aria-hidden="true">
+    <div class="stars"></div>
+
+    <div class="snowfall">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <svg class="mountains" viewBox="0 0 1440 750"
+         preserveAspectRatio="xMidYMid slice"
+         xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="farMountain" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#315f91"/>
+          <stop offset="1" stop-color="#123459"/>
+        </linearGradient>
+        <linearGradient id="nearMountain" x1="0" y1="0" x2="0.7" y2="1">
+          <stop offset="0" stop-color="#3476ad"/>
+          <stop offset="1" stop-color="#0a294c"/>
+        </linearGradient>
+        <linearGradient id="snow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#f5f9ff"/>
+          <stop offset="1" stop-color="#9cc4ec"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Sommets au loin -->
+      <path d="M0 365 L105 255 170 310 280 150 365 280
+               455 218 555 320 655 195 745 302 850 175
+               950 285 1060 190 1165 290 1270 140 1360 255
+               1440 205 V750 H0Z" fill="url(#farMountain)"/>
+
+      <!-- Neige des sommets -->
+      <path d="M0 365 L105 255 170 310 280 150 365 280
+               455 218 555 320 655 195 745 302 850 175
+               950 285 1060 190 1165 290 1270 140 1360 255
+               1440 205 L1360 285 1270 175 1165 325 1060 225
+               950 320 850 205 745 335 655 230 555 350
+               455 250 365 310 280 190 170 340 105 290 0 405Z"
+            fill="url(#snow)"/>
+
+      <!-- Grandes pentes -->
+      <path d="M0 425 L170 300 320 390 455 235 610 410
+               760 315 910 430 1060 280 1200 405 1330 275
+               1440 350 V750 H0Z" fill="url(#nearMountain)"/>
+
+      <!-- Faces enneigées des pentes -->
+      <path d="M0 425 L170 300 320 390 455 235 610 410
+               760 315 910 430 1060 280 1200 405 1330 275
+               1440 350 L1360 370 1330 310 1200 440
+               1120 385 1060 310 980 450 910 430 835 465
+               760 345 680 450 610 410 540 450 455 270
+               385 440 320 390 245 435 170 335 100 455 0 465Z"
+            fill="url(#snow)" opacity=".94"/>
+
+      <!-- Ombres sur les reliefs -->
+      <path d="M0 465 L100 455 170 335 245 435 320 390
+               385 440 455 270 540 450 610 410 680 450
+               760 345 835 465 910 430 980 450 1060 310
+               1120 385 1200 440 1330 310 1360 370 1440 350
+               V750 H0Z" fill="#17436f" opacity=".55"/>
+
+      <!-- Vallée -->
+      <path d="M0 520 Q180 475 340 530 T700 535
+               T1050 510 T1440 515 V750 H0Z" fill="#071e39"/>
+
+      <!-- Sapins à gauche -->
+      <g fill="#06172c">
+        <path d="M25 560 l25 -55 25 55 H59 l21 35 H65 l25 42 H10 l25 -42 H20 l21 -35Z"/>
+        <path d="M100 595 l20 -44 20 44 H128 l17 28 H133 l19 35 H88 l19 -35 H95 l17 -28Z"/>
+        <path d="M180 620 l17 -37 17 37 H204 l14 24 H200 l16 30 H174 l16 -30 H176 l14 -24Z"/>
+      </g>
+
+      <!-- Sapins à droite -->
+      <g fill="#06172c">
+        <path d="M1250 585 l25 -54 25 54 H1281 l20 35 H1284 l22 40 H1239 l22 -40 H1243 l20 -35Z"/>
+        <path d="M1330 610 l21 -46 21 46 H1356 l17 30 H1359 l19 36 H1324 l19 -36 H1330 l17 -30Z"/>
+        <path d="M1400 570 l23 -50 23 50 H1430 l18 33 H1435 l20 39 H1389 l20 -39 H1393 l18 -33Z"/>
+      </g>
+    </svg>
+
+    <!-- Ours immobiles, placés sur les pentes -->
+    <div class="mountain-bears">
+      <svg class="mountain-bear bear-left" viewBox="0 0 160 100"
+           xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(-8 80 50)">
+          <path d="M18 75 L130 84 L145 91 L31 84Z" fill="#041326"/>
+          <path d="M28 79 L137 87" stroke="#eec66d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M33 74 L130 82" stroke="#c4e2ff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M44 45 Q50 29 75 34 L99 43 Q109 49 104 65 L79 73 L50 65Z" fill="#f5f7fc"/>
+          <circle cx="45" cy="35" r="18" fill="#f5f7fc"/>
+          <circle cx="33" cy="20" r="7" fill="#f5f7fc"/>
+          <circle cx="53" cy="19" r="7" fill="#f5f7fc"/>
+          <path d="M27 30 Q28 7 48 9 Q65 11 66 30 L58 34 Q44 22 29 38Z" fill="#c8324c"/>
+          <path d="M28 33 Q45 26 62 34 L60 40 Q43 33 30 41Z" fill="#fff"/>
+          <circle cx="39" cy="35" r="2.5" fill="#142b45"/>
+          <circle cx="51" cy="35" r="2.5" fill="#142b45"/>
+          <ellipse cx="45" cy="42" rx="7" ry="5" fill="#d4dfed"/>
+          <circle cx="45" cy="40" r="2.5" fill="#142b45"/>
+          <path d="M62 49 L79 53 L83 64 L68 68 L56 60Z" fill="#f5f7fc"/>
+          <path d="M55 61 L47 73 L64 76 L71 68Z" fill="#e3eaf4"/>
+          <path d="M92 49 L108 54 L119 51" fill="none" stroke="#f5f7fc" stroke-width="7" stroke-linecap="round"/>
+          <path d="M63 72 L77 74 M94 76 L108 78" stroke="#eec66d" stroke-width="4" stroke-linecap="round"/>
+          <path d="M26 28 L9 18 L17 33 L5 38 L25 40Z" fill="#c8324c"/>
+        </g>
+      </svg>
+
+      <svg class="mountain-bear bear-center" viewBox="0 0 160 100"
+           xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(7 80 50)">
+          <path d="M18 75 L130 84 L145 91 L31 84Z" fill="#041326"/>
+          <path d="M28 79 L137 87" stroke="#eec66d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M33 74 L130 82" stroke="#c4e2ff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M44 45 Q50 29 75 34 L99 43 Q109 49 104 65 L79 73 L50 65Z" fill="#f5f7fc"/>
+          <circle cx="45" cy="35" r="18" fill="#f5f7fc"/>
+          <circle cx="33" cy="20" r="7" fill="#f5f7fc"/>
+          <circle cx="53" cy="19" r="7" fill="#f5f7fc"/>
+          <path d="M27 30 Q28 7 48 9 Q65 11 66 30 L58 34 Q44 22 29 38Z" fill="#c8324c"/>
+          <path d="M28 33 Q45 26 62 34 L60 40 Q43 33 30 41Z" fill="#fff"/>
+          <circle cx="39" cy="35" r="2.5" fill="#142b45"/>
+          <circle cx="51" cy="35" r="2.5" fill="#142b45"/>
+          <ellipse cx="45" cy="42" rx="7" ry="5" fill="#d4dfed"/>
+          <circle cx="45" cy="40" r="2.5" fill="#142b45"/>
+          <path d="M62 49 L79 53 L83 64 L68 68 L56 60Z" fill="#f5f7fc"/>
+          <path d="M55 61 L47 73 L64 76 L71 68Z" fill="#e3eaf4"/>
+          <path d="M92 49 L108 54 L119 51" fill="none" stroke="#f5f7fc" stroke-width="7" stroke-linecap="round"/>
+          <path d="M63 72 L77 74 M94 76 L108 78" stroke="#eec66d" stroke-width="4" stroke-linecap="round"/>
+          <path d="M26 28 L9 18 L17 33 L5 38 L25 40Z" fill="#c8324c"/>
+        </g>
+      </svg>
+
+      <svg class="mountain-bear bear-right" viewBox="0 0 160 100"
+           xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(-6 80 50)">
+          <path d="M18 75 L130 84 L145 91 L31 84Z" fill="#041326"/>
+          <path d="M28 79 L137 87" stroke="#eec66d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M33 74 L130 82" stroke="#c4e2ff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M44 45 Q50 29 75 34 L99 43 Q109 49 104 65 L79 73 L50 65Z" fill="#f5f7fc"/>
+          <circle cx="45" cy="35" r="18" fill="#f5f7fc"/>
+          <circle cx="33" cy="20" r="7" fill="#f5f7fc"/>
+          <circle cx="53" cy="19" r="7" fill="#f5f7fc"/>
+          <path d="M27 30 Q28 7 48 9 Q65 11 66 30 L58 34 Q44 22 29 38Z" fill="#c8324c"/>
+          <path d="M28 33 Q45 26 62 34 L60 40 Q43 33 30 41Z" fill="#fff"/>
+          <circle cx="39" cy="35" r="2.5" fill="#142b45"/>
+          <circle cx="51" cy="35" r="2.5" fill="#142b45"/>
+          <ellipse cx="45" cy="42" rx="7" ry="5" fill="#d4dfed"/>
+          <circle cx="45" cy="40" r="2.5" fill="#142b45"/>
+          <path d="M62 49 L79 53 L83 64 L68 68 L56 60Z" fill="#f5f7fc"/>
+          <path d="M55 61 L47 73 L64 76 L71 68Z" fill="#e3eaf4"/>
+          <path d="M92 49 L108 54 L119 51" fill="none" stroke="#f5f7fc" stroke-width="7" stroke-linecap="round"/>
+          <path d="M63 72 L77 74 M94 76 L108 78" stroke="#eec66d" stroke-width="4" stroke-linecap="round"/>
+          <path d="M26 28 L9 18 L17 33 L5 38 L25 40Z" fill="#c8324c"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <p class="eyebrow">GRENOBLE INP · ENSE³</p>
+
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <rect x="7" y="7" width="86" height="86" rx="25"
+              fill="#0b2a4d" stroke="#3979b8" stroke-width="1.5"/>
+        <circle cx="50" cy="53" r="30" fill="#f3f6fc"/>
+        <circle cx="28" cy="31" r="9" fill="#f3f6fc"/>
+        <circle cx="72" cy="31" r="9" fill="#f3f6fc"/>
+        <path d="M20 34 Q19 9 48 9 Q70 9 80 31 L72 39 Q50 24 28 42Z" fill="#c8324c"/>
+        <path d="M20 35 Q46 24 75 37 L74 44 Q47 32 24 44Z" fill="#fff"/>
+        <circle cx="39" cy="51" r="3" fill="#102744"/>
+        <circle cx="61" cy="51" r="3" fill="#102744"/>
+        <ellipse cx="50" cy="62" rx="13" ry="9" fill="#d8e2f0"/>
+        <ellipse cx="50" cy="59" rx="5" ry="4" fill="#102744"/>
+        <path d="M50 63 L50 68 Q44 73 39 68 M50 68 Q56 73 61 68"
+              fill="none" stroke="#102744" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h1>Secret <span>Santa</span></h1>
+    <div class="title-underline"></div>
+  </header>
+
+  <main>
+    <section class="panel" aria-labelledby="signup-title">
+      <div class="panel-heading">
+        <span class="step-number">01</span>
+        <h2 id="signup-title">Inscription</h2>
+      </div>
+
+      <form id="signup-form">
+        <div class="form-grid">
+          <label class="field">
+            <span class="field-content">
+              <span class="field-label">Prénom</span>
+              <input type="text" name="first_name" placeholder="Prénom"
+                     autocomplete="given-name" required>
+            </span>
+          </label>
+
+          <label class="field">
+            <span class="field-content">
+              <span class="field-label">Nom</span>
+              <input type="text" name="last_name" placeholder="Nom"
+                     autocomplete="family-name" required>
+            </span>
+          </label>
+
+          <label class="field field-wide">
+            <span class="field-content">
+              <span class="field-label">Téléphone</span>
+              <input type="tel" name="phone" placeholder="06 12 34 56 78"
+                     autocomplete="tel" required>
+            </span>
+          </label>
+
+          <label class="field field-wide field-photo" for="photo-input">
+            <span class="field-content">
+              <span class="field-label">Photo</span>
+              <input type="file" id="photo-input" accept="image/*" class="hidden">
+              <span id="photo-placeholder" class="photo-placeholder">
+                <span id="photo-title">Choisir ou prendre une photo</span>
+              </span>
+              <img id="photo-preview" class="photo-preview hidden" alt="Aperçu de la photo">
+            </span>
+          </label>
+        </div>
+
+        <button class="button button-red" type="submit">
+          Obtenir mon code <span aria-hidden="true">→</span>
+        </button>
+        <p id="signup-result" class="result-message hidden" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="lookup-title">
+      <div class="panel-heading">
+        <span class="step-number">02</span>
+        <h2 id="lookup-title">Mon destinataire</h2>
+      </div>
+
+      <form id="lookup-form">
+        <label class="field field-code">
+          <span class="field-content">
+            <span class="field-label">Code secret</span>
+            <input type="text" name="code" placeholder="ABC-123"
+                   maxlength="7" autocomplete="off" required>
+          </span>
+        </label>
+
+        <button class="button button-gold" type="submit">
+          Révéler <span aria-hidden="true">→</span>
+        </button>
+        <p id="lookup-result" class="result-message hidden" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- Administration discrète et repliée par défaut -->
+    <details class="admin-discreet">
+      <summary>Administration</summary>
+
+      <section class="panel admin-panel" aria-label="Administration">
+        <form id="admin-login-form">
+          <label class="field">
+            <span class="field-content">
+              <span class="field-label">Mot de passe</span>
+              <input type="password" name="password" placeholder="Mot de passe"
+                     autocomplete="current-password" required>
+            </span>
+          </label>
+
+          <button class="button button-blue" type="submit">
+            Se connecter
+          </button>
+        </form>
+
+        <p id="admin-message" class="result-message hidden" aria-live="polite"></p>
+
+        <div id="admin-panel" class="hidden" hidden>
+          <div class="admin-stats">
+            <span>Participants</span>
+            <strong id="participant-count">—</strong>
+          </div>
+
+          <p id="draw-status" class="result-message" aria-live="polite"></p>
+
+          <div class="admin-actions">
+            <button id="draw-button" class="button button-gold" type="button">
+              Lancer le tirage
+            </button>
+            <button id="refresh-results" class="button button-blue" type="button">
+              Actualiser
+            </button>
+            <button id="admin-logout" class="button button-secondary" type="button">
+              Déconnexion
+            </button>
+          </div>
+
+          <ul id="participant-list" class="participant-list"></ul>
+          <div id="admin-results" class="admin-results hidden"></div>
+        </div>
+      </section>
+    </details>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
